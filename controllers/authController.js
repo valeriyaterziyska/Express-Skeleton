@@ -1,4 +1,6 @@
 const router = require("express").Router();
+const { body } = require("express-validator");
+const { validationResult } = require("express-validator");
 const authService = require("../services/authService");
 
 router.get("/", (req, res) => {
@@ -6,26 +8,56 @@ router.get("/", (req, res) => {
 });
 
 router.get("/login", (req, res) => {
-    res.render('login');
+    res.render("login");
 });
 
-router.post("/login", (req, res) => {
-    res.redirect("/");
+router.post("/login", (req, res, next) => {
+    const { username, password } = req.body;
+    authService
+        .login(username, password)
+        .then((user) => {
+            res.redirect("/");
+        })
+        .catch(err => {
+            console.log(err);
+            next(err);
+        });
 });
 
 router.get("/register", (req, res) => {
-    res.render('register');
+    res.render("register");
 });
 
-router.post("/register", (req, res, next) => {
-    const {username, password} = req.body;
-    authService.register(username, password)
-        .then(createdUser => {
-            res.redirect("/auth/login");
-        }).catch(next);
+router.post(
+    "/register",
+    body("password-repeat")
+        .trim()
+        .custom((value, { req }) => {
+            if (value != req.body.password) {
+                return Promise.reject("Password missmatch!");
+            }
+        }),
+    (req, res, next) => {
+        let errors = validationResult(req).array();
 
-    console.log(req.body);
+        //TODO: rework needed
+        if (errors.length > 0) {
+            let error = errors[0];
 
-});
+            error.message = error.msg;
+            return next(error);
+        }
+
+        const { username, password } = req.body;
+
+        authService
+            .register(username, password)
+            .then((createdUser) => {
+                console.log(createdUser);
+                res.redirect("/auth/login");
+            })
+            .catch(next);
+    }
+);
 
 module.exports = router;
