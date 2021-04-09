@@ -13,12 +13,14 @@ router.get("/login", (req, res) => {
 
 router.post("/login", (req, res, next) => {
     const { username, password } = req.body;
+
     authService
         .login(username, password)
-        .then((user) => {
+        .then((token) => {
+            res.cookie("token", token, { httpOnly: true });
             res.redirect("/");
         })
-        .catch(err => {
+        .catch((err) => {
             console.log(err);
             next(err);
         });
@@ -53,6 +55,8 @@ router.post(
         authService
             .register(username, password)
             .then((createdUser) => {
+                console.log("createdUser");
+
                 console.log(createdUser);
                 res.redirect("/auth/login");
             })
