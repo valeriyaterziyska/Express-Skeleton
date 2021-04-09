@@ -3,4 +3,7 @@ const errorHandler = (err, req, res, next) => {
     let status = err.status || 500;
 
     // TODO Add page to render
+  
 }
+
+module.exports = errorHandler;
