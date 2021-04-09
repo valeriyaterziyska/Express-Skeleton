@@ -12,9 +12,4 @@ require("./config/express")(app);
 app.use(routes);
 app.use(errorHandler);
 
-
-
-
-
-
 app.listen(PORT, () => console.log(`Server is runnig on port ${PORT}..`));
