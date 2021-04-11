@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,10 +8,12 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <title>JS Backend Exam</title>
 </head>
+
 <body>
     {{#if error}}
-        <div style="background-color: red">{{error.message}}</div>
+    <div style="background-color: red;">{{error.message}}</div>
     {{/if}}
     {{{body}}}
 </body>
+
 </html>

@@ -1,7 +1,8 @@
 const router = require("express").Router();
-const { body } = require("express-validator");
-const { validationResult } = require("express-validator");
+const { body, validationResult  } = require("express-validator");
+
 const authService = require("../services/authService");
+const {COOKIE_NAME} = require("../config/config");
 
 router.get("/", (req, res) => {
     res.send("Authcontroller");
@@ -17,7 +18,7 @@ router.post("/login", (req, res, next) => {
     authService
         .login(username, password)
         .then((token) => {
-            res.cookie("token", token, { httpOnly: true });
+            res.cookie(COOKIE_NAME, token, { httpOnly: true });
             res.redirect("/");
         })
         .catch((err) => {
@@ -42,15 +43,17 @@ router.post(
     (req, res, next) => {
         let errors = validationResult(req).array();
 
+
         //TODO: rework needed
         if (errors.length > 0) {
             let error = errors[0];
-
+            
             error.message = error.msg;
             return next(error);
         }
 
         const { username, password } = req.body;
+        console.log(req.body);
 
         authService
             .register(username, password)
@@ -63,5 +66,10 @@ router.post(
             .catch(next);
     }
 );
+
+router.get("/logout", (req, res) => {
+    res.clearCookie(COOKIE_NAME);
+    res.redirect("/");
+})
 
 module.exports = router;
